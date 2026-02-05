@@ -55,7 +55,7 @@ If none are true, it doesn't get saved. Period.
 
 ## Commands
 
-When installed as a plugin, commands are namespaced: `/total-recall:recall-write`. Standalone install uses `/recall-write`.
+When installed as a plugin, commands are namespaced: `/recall:recall-write`. Standalone install uses `/recall-write`.
 
 | Command | What it does |
 |---------|-------------|
@@ -110,9 +110,17 @@ Archive (memory/archive/)
 | Hook | When | What |
 |------|------|------|
 | **SessionStart** | Session begins | Injects open loops + recent daily log highlights |
-| **PreCompact** | Before compaction | Flushes conversation context to daily log |
+| **PreCompact** | Before compaction | Writes compaction marker to daily log |
 
 Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths portably. They're safety nets — the protocol also instructs Claude on these behaviors, but hooks ensure it happens even if the protocol isn't followed.
+
+**Transcript extraction is opt-in.** By default, the PreCompact hook only writes a timestamp marker. To enable extracting recent user messages from the conversation transcript (useful for preserving context across compaction), set:
+
+```bash
+export RECALL_EXTRACT_TRANSCRIPT=1
+```
+
+This is off by default to comply with Anthropic's directory policy on conversation data.
 
 ## What Auto-Loads (Deterministic)
 
@@ -194,12 +202,17 @@ Total Recall complements [Superpowers](https://github.com/superpowers-ai/superpo
 - Deterministic loading via native Claude Code mechanisms
 - Transparent markdown files, not a black-box database
 
-## Privacy
+## Privacy & Security
 
+- **Local only. No network calls. No telemetry. No external dependencies.**
+- All memory is stored as plain markdown files in your project directory
 - `CLAUDE.local.md` is automatically gitignored (personal working memory)
-- `memory/` may contain preferences, people context, project decisions
-- Consider adding `memory/` to `.gitignore` for personal projects
+- `memory/` may contain preferences, people context, project decisions — consider adding to `.gitignore` for personal projects
 - `.claude/settings.local.json` is personal hook config (not committed)
+- Transcript extraction (reading conversation history) is **off by default** — opt-in via `RECALL_EXTRACT_TRANSCRIPT=1`
+- Hooks only read/write files inside your project's `memory/` directory
+- To audit: all hook code is in `hooks/*.sh`, all memory is in `memory/` — plain text, fully inspectable
+- To uninstall: remove `memory/`, `CLAUDE.local.md`, and the `.claude/` entries (or `/plugin uninstall recall`)
 
 ## License
 

@@ -2,7 +2,8 @@
 # Total Recall — PreCompact Hook
 #
 # Fires before context compaction. Writes a compaction marker to today's
-# daily log and extracts recent user turns from the transcript.
+# daily log. Transcript extraction is OPT-IN via RECALL_EXTRACT_TRANSCRIPT=1
+# to comply with Anthropic's directory policy.
 #
 # Hook input: JSON object on stdin with transcript_path field.
 # Transcript file: JSONL (one JSON object per line).
@@ -52,11 +53,17 @@ except:
 " 2>/dev/null || echo "")
 fi
 
-# Append compaction marker
+# Append compaction marker (always — this is safe)
 echo "" >> "$DAILY"
 echo "## [pre-compact $NOW]" >> "$DAILY"
+echo "" >> "$DAILY"
+echo "- Compaction occurred at $NOW." >> "$DAILY"
 
-if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
+# Transcript extraction is OPT-IN only.
+# Set RECALL_EXTRACT_TRANSCRIPT=1 in your environment to enable.
+# This reads recent user messages from the conversation transcript
+# to preserve context across compaction.
+if [ "${RECALL_EXTRACT_TRANSCRIPT:-0}" = "1" ] && [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   echo "" >> "$DAILY"
   echo "Recent context before compaction:" >> "$DAILY"
   echo "" >> "$DAILY"
@@ -90,9 +97,6 @@ except Exception:
 for t in turns[-5:]:
     print(f'- {t}')
 " >> "$DAILY" 2>/dev/null || echo "- (could not extract transcript context)" >> "$DAILY"
-
-else
-  echo "- Compaction occurred. No transcript available for extraction." >> "$DAILY"
 fi
 
 echo "" >> "$DAILY"
