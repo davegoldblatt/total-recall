@@ -27,21 +27,21 @@ Stale entries needing verification:
 
 Scan across tiers for conflicting claims:
 - Same topic with different values in different files
-- MEMORY.md says one thing, a register says another
+- CLAUDE.local.md says one thing, a register says another
 - Superseded entries that still appear as current elsewhere
 
 Flag any found:
 ```
 Potential contradictions:
 
-1. MEMORY.md says "deadline is March 1"
+1. CLAUDE.local.md says "deadline is March 1"
    decisions.md says "deadline moved to March 15"
    → Which is current?
 ```
 
-### 3. MEMORY.md Pruning
+### 3. CLAUDE.local.md Pruning
 
-Review MEMORY.md for:
+Review CLAUDE.local.md for:
 - Items that haven't been relevant in 2+ weeks
 - Completed open loops that should be closed
 - Information that belongs in a register rather than working memory
@@ -49,7 +49,7 @@ Review MEMORY.md for:
 
 Suggest removals:
 ```
-MEMORY.md pruning candidates:
+CLAUDE.local.md pruning candidates:
 
 1. "Project Beta on hold since January" — still relevant?
 2. "Waiting on budget approval from Sarah" — resolved?
@@ -62,7 +62,7 @@ Current: [N] words. Target: under 1500.
 Read memory/registers/open-loops.md. For each active item:
 - Is it still open?
 - Is it past due?
-- Should it be escalated to MEMORY.md?
+- Should it be escalated to CLAUDE.local.md?
 
 ### 5. Daily Log Archival
 
@@ -76,7 +76,7 @@ If daily logs older than 30 days exist:
 Maintenance complete:
   Stale entries verified: [N]
   Contradictions found: [N]
-  MEMORY.md pruned: [N] words removed
+  CLAUDE.local.md pruned: [N] words removed
   Open loops reviewed: [N] active, [N] closed
   Daily logs archived: [N]
 

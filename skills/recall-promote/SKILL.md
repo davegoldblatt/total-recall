@@ -2,7 +2,7 @@
 description: Review daily logs and promote entries to registers or working memory.
 disable-model-invocation: true
 ---
-Review recent daily logs and surface candidates for promotion to registers or MEMORY.md.
+Review recent daily logs and surface candidates for promotion to registers or CLAUDE.local.md.
 
 ## What To Do
 
@@ -19,7 +19,7 @@ No daily logs found. Use /recall-write or /recall-log to start capturing.
 
 Scan each entry and evaluate:
 
-**Promote to MEMORY.md if:**
+**Promote to CLAUDE.local.md if:**
 - Active commitment or deadline that affects every session
 - Behavioral preference that changes default output
 - Current project state that's essential context
@@ -32,7 +32,7 @@ Scan each entry and evaluate:
 - Project milestone or state change → projects.md
 
 **Skip if:**
-- Already captured in a register or MEMORY.md
+- Already captured in a register or CLAUDE.local.md
 - One-off observation with no future impact
 - Debugging detail or transient state
 
@@ -44,7 +44,7 @@ For each candidate, show:
 Candidates for promotion:
 
 1. [2026-02-03] "Project deadline moved to March 15"
-   → Suggest: MEMORY.md (active commitment)
+   → Suggest: CLAUDE.local.md (active commitment)
 
 2. [2026-02-02] "Prefers tabs over spaces, 2-space indent"
    → Suggest: registers/preferences.md
@@ -73,10 +73,10 @@ For each promoted item:
 ```
 Promotion complete:
   → 2 entries promoted to registers
-  → 1 entry promoted to MEMORY.md
+  → 1 entry promoted to CLAUDE.local.md
   → 1 entry skipped
 
-MEMORY.md word count: [N]/1500
+CLAUDE.local.md word count: [N]/1500
 ```
 
-Warn if MEMORY.md is approaching the 1500 word limit.
+Warn if CLAUDE.local.md is approaching the 1500 word limit.

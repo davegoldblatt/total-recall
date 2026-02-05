@@ -7,7 +7,7 @@ Query to forget: $ARGUMENTS
 ### 1. Search for Matching Entries
 
 Search across all memory tiers for content matching the query:
-- memory/MEMORY.md
+- memory/CLAUDE.local.md
 - memory/registers/*.md
 - memory/daily/*.md
 
@@ -16,7 +16,7 @@ Search across all memory tiers for content matching the query:
 ```
 Found [N] entries matching "[query]":
 
-1. [MEMORY.md] "Prefers dark mode for all mockups"
+1. [CLAUDE.local.md] "Prefers dark mode for all mockups"
 2. [registers/preferences.md] "Dark mode preference (confidence: high, 2026-01-10)"
 3. [daily/2026-01-10.md] "[14:00] User said they prefer dark mode"
 ```
@@ -41,7 +41,7 @@ For each confirmed entry:
 - **original_date**: 2026-01-10
 ```
 
-**In MEMORY.md:** Remove the entry entirely (working memory should only contain current facts)
+**In CLAUDE.local.md:** Remove the entry entirely (working memory should only contain current facts)
 
 **In daily logs:** Add a note but don't modify the original entry (daily logs are historical record)
 ```
