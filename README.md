@@ -9,7 +9,8 @@ Other memory tools dump everything into context. Total Recall does the opposite:
 **As a plugin** (recommended):
 
 ```
-/install github:davegoldblatt/total-recall
+/plugin marketplace add davegoldblatt/recall-marketplace
+/plugin install recall@recall-marketplace
 ```
 
 **Or standalone** (copies files into your project's `.claude/` directory):
@@ -109,10 +110,12 @@ Archive (memory/archive/)
 
 | Hook | When | What |
 |------|------|------|
-| **SessionStart** | Session begins | Injects open loops + recent daily log highlights |
-| **PreCompact** | Before compaction | Writes compaction marker to daily log |
+| **SessionStart** | Session begins | Injects open loops + recent daily log highlights into Claude's context |
+| **PreCompact** | Before compaction | Writes compaction marker to daily log (file write only, not injected) |
 
-Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths portably. They're safety nets — the protocol also instructs Claude on these behaviors, but hooks ensure it happens even if the protocol isn't followed.
+**How they differ:** SessionStart stdout is injected as model-visible context — Claude sees it. PreCompact stdout is not visible to the model; it only writes files to disk. This is by design: SessionStart primes the session, PreCompact preserves a record.
+
+Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths portably. All hooks fail open — errors never block Claude Code.
 
 **Transcript extraction is opt-in.** By default, the PreCompact hook only writes a timestamp marker. To enable extracting recent user messages from the conversation transcript (useful for preserving context across compaction), set:
 
@@ -133,7 +136,7 @@ These use Claude Code's native mechanisms — they load every session without an
 
 ## File Structure
 
-**Plugin format** (installed via `/install`):
+**Plugin format** (installed via `/plugin install`):
 
 ```
 total-recall/                     # Plugin root
