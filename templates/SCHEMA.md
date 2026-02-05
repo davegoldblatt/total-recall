@@ -1,74 +1,99 @@
 # Total Recall — Memory Schema
 
 > This file teaches Claude how the memory system works.
-> It is loaded every session alongside MEMORY.md.
-> Do NOT delete or modify this file unless upgrading Total Recall.
+> Read it on session start for reference. The protocol rules
+> auto-load via `.claude/rules/total-recall.md`.
 
 ---
 
 ## How Memory Works
 
-You have a persistent memory system with four tiers. Data flows upward through compression (raw → structured → essential → archived) and is retrieved downward on demand (working memory → registers → daily logs → archive).
+You have a persistent memory system with four tiers. Data flows upward through compression (raw → structured → essential → archived) and is retrieved downward on demand.
 
-### Tier Architecture
+### What Loads Automatically (Deterministic)
 
-| Tier | Location | Loaded | Purpose |
-|------|----------|--------|---------|
-| Working Memory | memory/MEMORY.md | Every session | Essential context (~1500 words). Only behavior-changing facts. |
-| Registers | memory/registers/*.md | On demand | Structured domain knowledge with metadata. Searched when a topic arises. |
-| Daily Logs | memory/daily/YYYY-MM-DD.md | Today + yesterday | Raw timestamped capture. Low ceremony, high fidelity. |
-| Archive | memory/archive/ | On search only | Completed projects, superseded decisions, old logs. Never auto-loaded. |
+These files are loaded by Claude Code's native mechanisms — no action needed:
 
-### Data Flow
+| File | Mechanism | Purpose |
+|------|-----------|---------|
+| `.claude/rules/total-recall.md` | Auto-loaded via rules/ | Memory protocol and write gate rules |
+| `CLAUDE.local.md` | Auto-loaded via Claude Code | Working memory (~1500 words) |
+
+### What To Check On Session Start
+
+Read these proactively at the start of each session:
+
+| File | Purpose |
+|------|---------|
+| `memory/registers/open-loops.md` | Active follow-ups and deadlines |
+| `memory/daily/[today].md` | Today's daily log |
+| `memory/daily/[yesterday].md` | Yesterday's daily log |
+| `memory/registers/_index.md` | What registers exist |
+
+### What To Search On Demand
+
+| Location | Search When |
+|----------|-------------|
+| `memory/registers/people.md` | A person is mentioned |
+| `memory/registers/projects.md` | A project is discussed |
+| `memory/registers/decisions.md` | Past choices are questioned |
+| `memory/registers/preferences.md` | Style/approach matters |
+| `memory/registers/tech-stack.md` | Technical choices come up |
+| `memory/archive/` | Historical context needed |
+
+**Do NOT load everything.** Pull only what's relevant.
+
+---
+
+## Tier Architecture
 
 ```
-Conversation (ephemeral)
+Conversation (ephemeral — compacted/discarded)
     │
     ▼ WRITE GATE: "Does this change future behavior?"
     │
-Daily Log (raw capture)
+Daily Log (memory/daily/YYYY-MM-DD.md)
+    Raw timestamped capture. All writes land here first.
     │
     ▼ PROMOTION: "Will this matter in 30 days?"
     │
-Registers (structured knowledge)
+Registers (memory/registers/*.md)
+    Structured domain knowledge with metadata.
     │
-    ▼ DISTILLATION: "Is this essential for every session?"
+    ▼ DISTILLATION: "Essential for every session?"
     │
-MEMORY.md (working memory)
+Working Memory (CLAUDE.local.md)
+    ~1500 words. Auto-loaded. Only behavior-changing facts.
     │
-    ▼ EXPIRY: "Is this completed or superseded?"
+    ▼ EXPIRY: "Completed or superseded?"
     │
-Archive (searchable history)
+Archive (memory/archive/)
+    Searchable history. Never auto-loaded.
 ```
 
 ---
 
 ## The Write Gate
 
-Before writing ANYTHING to memory, apply this gate:
+Before writing ANYTHING to memory:
 
-1. **Does it change future behavior?** (preference, boundary, recurring pattern) → WRITE
-2. **Is it a commitment with consequences?** (deadline, deliverable, follow-up) → WRITE
-3. **Is it a decision with rationale?** (why X over Y, worth preserving) → WRITE
-4. **Is it a stable fact that will matter again?** (not transient, not obvious) → WRITE
+1. **Does it change future behavior?** → WRITE
+2. **Is it a commitment with consequences?** → WRITE
+3. **Is it a decision with rationale?** → WRITE
+4. **Is it a stable fact that will matter again?** → WRITE
 5. **Did the user explicitly say "remember this"?** → ALWAYS WRITE
 
-If NONE of these are true → **DO NOT WRITE**. Resist the urge to log. The bar is: would a sharp chief of staff note this, or would only a junior analyst bother?
+If NONE are true → **DO NOT WRITE.**
 
-### Write — Examples
+### Default Destination: Daily Log
 
-- "I prefer bullet points over prose" → preferences.md + MEMORY.md
-- "The deadline is March 15" → open-loops.md + MEMORY.md
-- "We chose Postgres because we need JSONB" → decisions.md
-- "Sarah is the new PM, she prefers async" → people.md
-- "Remember: never CC Dave on technical threads" → preferences.md + MEMORY.md
+All writes go to `memory/daily/YYYY-MM-DD.md` first. Promotion to registers or CLAUDE.local.md is a separate step — suggest it, but let the user decide.
 
-### Don't Write — Examples
+### Exceptions (Direct Promotion)
 
-- "Can you make that a bulleted list?" (one-off formatting, unless it's the third time)
-- "Thanks, that looks good" (acknowledgment)
-- "The error was on line 47" (debugging ephemera)
-- "I'm working on the login page right now" (transient state)
+- **Corrections** — update the register immediately, mark old as superseded
+- **Explicit "remember this"** — write to appropriate register directly
+- **Deadlines/commitments** — always go to open-loops.md + daily log
 
 ---
 
@@ -76,14 +101,13 @@ If NONE of these are true → **DO NOT WRITE**. Resist the urge to log. The bar 
 
 | Trigger | Primary Destination | Also Update |
 |---------|-------------------|-------------|
-| User says "remember" | Daily log + register if durable | MEMORY.md if behavioral |
+| User says "remember" | Daily log + register | CLAUDE.local.md if behavioral |
 | User corrects Claude | Supersede old + write new | ALL locations with old claim |
-| Decision with rationale | registers/decisions.md | MEMORY.md if current |
-| New person context | registers/people.md | MEMORY.md if actively engaging |
-| Preference expressed | registers/preferences.md | MEMORY.md if affects defaults |
-| Commitment/deadline | registers/open-loops.md | MEMORY.md always |
-| Technical choice | registers/tech-stack.md | — |
-| Project state change | registers/projects.md | MEMORY.md if active project |
+| Decision with rationale | Daily log, suggest decisions.md | CLAUDE.local.md if current |
+| New person context | Daily log, suggest people.md | CLAUDE.local.md if active |
+| Preference expressed | Daily log, suggest preferences.md | CLAUDE.local.md if default |
+| Commitment/deadline | Daily log + open-loops.md | CLAUDE.local.md always |
+| Technical choice | Daily log, suggest tech-stack.md | — |
 
 ---
 
@@ -91,10 +115,10 @@ If NONE of these are true → **DO NOT WRITE**. Resist the urge to log. The bar 
 
 When new information contradicts existing memory:
 
-1. **NEVER silently overwrite.** The pattern of change is information.
-2. Mark the old entry as `[superseded: YYYY-MM-DD]` with reason.
-3. Write the new entry with reference to what it replaces.
-4. If confidence is low, ask the user to confirm before writing.
+1. **NEVER silently overwrite.**
+2. Mark old entry as `[superseded: YYYY-MM-DD]` with reason
+3. Write new entry with reference to what it replaces
+4. If confidence is low, ask the user to confirm
 
 ```markdown
 ## [superseded: 2026-02-05]
@@ -104,7 +128,7 @@ When new information contradicts existing memory:
 ## [current]
 - **claim**: Budget is $500K
 - **confidence**: high
-- **evidence**: Finance email, confirmed by user 2026-02-05
+- **evidence**: Finance email, confirmed by user
 - **last_verified**: 2026-02-05
 ```
 
@@ -112,23 +136,21 @@ When new information contradicts existing memory:
 
 ## Correction Gate
 
-Human corrections are the highest-priority write signal. When a correction arrives:
+Human corrections are the highest-priority write signal:
 
 1. **Write immediately** to the daily log
 2. **Update the relevant register** with superseded marking
-3. **Update MEMORY.md** if it changes default behavior
-4. **Search for the old claim** in all tiers and update everywhere
-
-One correction, multiple writes. A correction that only lasts one session is a compliance, not learning.
+3. **Update CLAUDE.local.md** if it changes default behavior
+4. **Search everywhere** for the old claim and update all instances
 
 ### Correction Severity
 
 | Type | Write To | Example |
 |------|----------|---------|
-| Behavioral | MEMORY.md + register + daily | "Don't send emails without asking" |
-| Factual | Register + daily | "The budget is $500K, not $400K" |
-| Style | Preferences + MEMORY.md if default | "Stop using headers in chat messages" |
-| One-off | Daily log only | "Use the blue logo for this specific deck" |
+| Behavioral | CLAUDE.local.md + register + daily | "Don't send emails without asking" |
+| Factual | Register + daily | "Budget is $500K, not $400K" |
+| Style | Preferences + CLAUDE.local.md if default | "Stop using headers in messages" |
+| One-off | Daily log only | "Use blue logo for this deck" |
 
 ---
 
@@ -143,41 +165,19 @@ For durable claims in registers, include metadata:
 - **last_verified**: YYYY-MM-DD
 ```
 
-Not every line needs full metadata — use it for claims that matter. Decisions with rationale, facts you'll act on, anything where being wrong has consequences.
+Not every line needs full metadata. Use it for claims where being wrong has consequences.
 
 ---
 
-## Session Protocol
+## Hooks
 
-### On Session Start
+If configured in `.claude/settings.json`:
 
-1. MEMORY.md is loaded (via CLAUDE.md)
-2. This file (SCHEMA.md) is loaded (via CLAUDE.md)
-3. Check today's and yesterday's daily logs for recent context
-4. Check open-loops.md for active items
-5. Read registers/_index.md to know what domains exist
+**SessionStart** — Injects open loops and recent daily log highlights as additional session context.
 
-### Dynamic Loading
+**PreCompact** — Writes a `[pre-compact]` marker to today's daily log and captures recent conversation context before compaction discards it.
 
-If the user's message implies a domain:
-- Mentions a person → read registers/people.md
-- Mentions a project → read registers/projects.md
-- Mentions a past decision → search registers/decisions.md
-- Asks "remember when" → search daily logs
-
-**Do NOT load everything.** Context window space is expensive. Pull the relevant section, not the whole file.
-
-### On Session End / Pre-Compaction
-
-Sweep the conversation for unsaved:
-1. Decisions made but not logged
-2. Commitments with deadlines
-3. Corrections from the user
-4. Open loops without resolution
-5. New preferences or behavioral changes
-
-Write findings to today's daily log with `[pre-compact]` tag.
-Update MEMORY.md "Session Continuity" section.
+These are safety nets. The protocol in `.claude/rules/total-recall.md` also instructs Claude to flush before compaction — the hooks ensure it happens even if the protocol isn't followed.
 
 ---
 
@@ -185,14 +185,14 @@ Update MEMORY.md "Session Continuity" section.
 
 | Cadence | Trigger | Action |
 |---------|---------|--------|
-| Immediate | Correction or significant event | Write to daily log + register + MEMORY.md as needed |
-| End-of-session | Session ending or compaction | Flush unsaved decisions, commitments, corrections |
-| Periodic (weekly) | User runs /recall-maintain | Verify stale entries, prune MEMORY.md, promote from daily logs |
-| Quarterly | User runs /recall-maintain | Distill registers into archive, reset cruft |
+| Immediate | Correction or significant event | Write to daily log + register as needed |
+| End-of-session | Session ending or compaction | Flush unsaved decisions, corrections, commitments |
+| Periodic (weekly) | `/recall-maintain` | Verify stale entries, prune CLAUDE.local.md, promote |
+| Quarterly | `/recall-maintain` | Distill registers into archive, reset cruft |
 
 ---
 
-## MEMORY.md Limits
+## CLAUDE.local.md Limits
 
 - **Hard cap**: ~1500 words
 - **Review**: Every few days
@@ -206,7 +206,7 @@ Update MEMORY.md "Session Continuity" section.
 | Command | Purpose |
 |---------|---------|
 | `/recall-init` | Scaffold the memory system |
-| `/recall-write <note>` | Write with gate evaluation |
+| `/recall-write <note>` | Write to daily log with gate evaluation |
 | `/recall-log <note>` | Quick append, no gate |
 | `/recall-search <query>` | Search all tiers |
 | `/recall-promote` | Review daily logs for promotion |

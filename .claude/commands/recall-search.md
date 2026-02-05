@@ -6,11 +6,11 @@ Query: $ARGUMENTS
 
 Search in this order (narrow to wide):
 
-### 1. Working Memory (memory/MEMORY.md)
+### 1. Working Memory (CLAUDE.local.md)
 Already loaded — check if the answer is here first.
 
 ### 2. Registers (memory/registers/*.md)
-Search all register files for content matching the query. Use grep/search across:
+Search all register files for content matching the query:
 - people.md
 - projects.md
 - decisions.md
@@ -24,6 +24,10 @@ Search the last 14 days of daily logs. Start with most recent.
 
 ### 4. Archive (memory/archive/)
 Only search here if nothing found in tiers 1-3, or if the query explicitly asks about historical/past items.
+
+## How to Search
+
+Use grep/ripgrep across the memory directory for matching content. This is keyword/pattern matching — search for relevant terms, synonyms, and related phrases.
 
 ## Output Format
 
@@ -48,7 +52,7 @@ Tell the user:
 ```
 No matching entries found in memory.
 
-Searched: MEMORY.md, 6 registers, [N] daily logs, [N] archive files.
+Searched: CLAUDE.local.md, [N] registers, [N] daily logs, [N] archive files.
 ```
 
 Suggest they use `/recall-write` to capture the information if they have it.

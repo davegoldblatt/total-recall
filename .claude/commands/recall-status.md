@@ -4,23 +4,21 @@ Show the health and status of the memory system.
 
 ### 1. Check Memory System Exists
 
-If memory/MEMORY.md doesn't exist:
+If CLAUDE.local.md and memory/ directory don't exist:
 ```
 Memory system not initialized. Run /recall-init to set up.
 ```
 
 ### 2. Gather Metrics
 
-Read and analyze:
-
-**MEMORY.md:**
+**CLAUDE.local.md (Working Memory):**
 - Word count (target: under 1500)
 - Last updated date
 - Number of open loops listed
 
 **Daily Logs (memory/daily/):**
 - Total number of files
-- Date range (oldest → newest)
+- Date range (oldest to newest)
 - Total size
 - Entries in last 7 days
 
@@ -34,43 +32,45 @@ Read and analyze:
 - Number of files
 - Total size
 
+**Hooks:**
+- Check .claude/settings.json or .claude/settings.local.json for SessionStart and PreCompact hook config
+
 ### 3. Display Status
 
 ```
 Memory System Status
 ────────────────────
 
-MEMORY.md:     [N] words ([N]% of 1500 limit)
-               Last updated: [date]
-               Open loops: [N]
+Working Memory:  [N] words ([N]% of 1500 limit)
+  (CLAUDE.local.md)  Last updated: [date]
+                     Open loops: [N]
 
-Daily logs:    [N] files, [size] total
-               Range: [oldest] → [newest]
-               Last 7 days: [N] entries
+Protocol:        .claude/rules/total-recall.md ✓
+Schema:          memory/SCHEMA.md ✓
 
-Registers:     [N] files, [size] total
-               Stale entries (>30 days): [N]
-               Superseded entries: [N]
+Daily logs:      [N] files, [size] total
+                 Range: [oldest] → [newest]
+                 Last 7 days: [N] entries
 
-Archive:       [N] files, [size] total
+Registers:       [N] files, [size] total
+                 Stale entries (>30 days): [N]
+                 Superseded entries: [N]
+
+Archive:         [N] files, [size] total
+
+Hooks:
+  SessionStart   [✓ configured / ✗ not configured]
+  PreCompact     [✓ configured / ✗ not configured]
 ```
 
 ### 4. Recommendations
 
-Based on the metrics, suggest actions:
+Based on metrics, suggest actions:
 
-- If MEMORY.md > 1200 words: "MEMORY.md approaching limit — consider archiving stale items"
+- If working memory > 1200 words: "Working memory approaching limit — consider archiving stale items"
 - If stale entries > 0: "Run /recall-maintain to verify [N] stale entries"
 - If no daily log in 3+ days: "No recent daily logs — memory capture may have gaps"
 - If open loops > 5: "Consider reviewing open loops — some may be resolved"
-- If no registers populated: "Registers are empty — use /recall-promote to populate from daily logs"
-- If MEMORY.md hasn't been updated in 7+ days: "MEMORY.md may be stale — review for accuracy"
-
-### 5. Quick Actions
-
-```
-Quick actions:
-  /recall-maintain     Verify stale entries and clean up
-  /recall-promote      Review daily logs for promotion
-  /recall-search       Find something in memory
-```
+- If registers are empty: "Registers are empty — use /recall-promote to populate from daily logs"
+- If working memory stale (7+ days): "Working memory may be stale — review for accuracy"
+- If hooks not configured: "Consider configuring SessionStart/PreCompact hooks for automated memory loading and flush"

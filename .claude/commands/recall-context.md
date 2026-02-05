@@ -2,38 +2,48 @@ Show what memory context is currently available in this session.
 
 ## What To Do
 
-### 1. Check What Exists
+### 1. Check What's Auto-Loaded
 
-Read and report on what memory files are present and accessible:
+These files load automatically via Claude Code's native mechanisms:
 
-**Always loaded:**
-- memory/MEMORY.md — exists? Word count?
+**Via .claude/rules/ (deterministic):**
+- .claude/rules/total-recall.md — memory protocol
+
+**Via CLAUDE.local.md (deterministic):**
+- CLAUDE.local.md — working memory
+
+### 2. Check What Exists On Disk
+
+Read and report on what memory files are present:
+
+**Schema:**
 - memory/SCHEMA.md — exists?
 
-**Session context:**
-- Today's daily log (memory/daily/[today].md) — exists? Entry count?
-- Yesterday's daily log — exists?
-- memory/registers/open-loops.md — exists? Active items?
+**Daily Logs:**
+- Today's log (memory/daily/[today].md) — exists? Entry count?
+- Yesterday's log — exists?
 
-**Available on demand:**
-- List all register files in memory/registers/
-- List recent daily logs (last 7 days)
-- List archive files
+**Registers:**
+- List all .md files in memory/registers/ with entry counts
 
-### 2. Display
+**Archive:**
+- List files in memory/archive/
+
+### 3. Display
 
 ```
 Memory Context — Current Session
 ─────────────────────────────────
 
-Loaded:
-  MEMORY.md           ✓  [N] words
-  SCHEMA.md           ✓
+Auto-loaded (deterministic):
+  .claude/rules/total-recall.md   ✓  Protocol rules
+  CLAUDE.local.md                 ✓  Working memory ([N] words)
 
-Session:
-  daily/[today].md    ✓  [N] entries
-  daily/[yesterday]   ✓  [N] entries
-  open-loops.md       ✓  [N] active items
+On disk:
+  memory/SCHEMA.md                ✓  Protocol docs
+  memory/daily/[today].md         ✓  [N] entries
+  memory/daily/[yesterday].md     ✓  [N] entries
+  memory/registers/open-loops.md  ✓  [N] active items
 
 Available registers:
   people.md           [N] entries
@@ -42,17 +52,25 @@ Available registers:
   preferences.md      [N] entries
   tech-stack.md       [N] entries
 
-Archive:
-  [N] files available for search
+Archive: [N] files
 
-Use /recall-search <query> to pull specific context from any tier.
+Hooks:
+  SessionStart    [configured/not configured]
+  PreCompact      [configured/not configured]
 ```
 
-### 3. Highlight Gaps
+### 4. Highlight Gaps
 
-If any expected files are missing, note them:
+If expected files are missing:
 ```
 Missing:
-  ✗ memory/SCHEMA.md — run /recall-init to create
+  ✗ CLAUDE.local.md — run /recall-init to create
   ✗ No daily log for today — will be created on first /recall-write
+```
+
+### 5. Quick Actions
+
+```
+Use /recall-search <query> to pull context from any tier.
+Use /recall-status for memory health metrics.
 ```

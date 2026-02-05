@@ -1,6 +1,7 @@
 # Working Memory
 
-> Loaded every session. ~1500 word limit. Only behavior-changing facts.
+> This is your working memory. Auto-loaded every session via CLAUDE.local.md.
+> ~1500 word limit. Only behavior-changing facts earn a place here.
 > Last updated: YYYY-MM-DD
 
 ## Active Context
