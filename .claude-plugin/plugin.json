@@ -1,0 +1,20 @@
+{
+  "name": "total-recall",
+  "description": "Curated persistent memory for Claude Code. Write gate prevents bloat — only behavior-changing facts get saved. Tiered architecture: daily logs, structured registers, and auto-loaded working memory.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dave Goldblatt",
+    "email": "dave@vibecap.co"
+  },
+  "homepage": "https://github.com/davegoldblatt/total-recall",
+  "repository": "https://github.com/davegoldblatt/total-recall",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "persistence",
+    "context",
+    "write-gate",
+    "curated-memory",
+    "session-continuity"
+  ]
+}
