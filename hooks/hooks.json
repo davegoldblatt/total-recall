@@ -2,14 +2,22 @@
   "hooks": {
     "SessionStart": [
       {
-        "type": "command",
-        "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/session-start.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/session-start.sh"
+          }
+        ]
       }
     ],
     "PreCompact": [
       {
-        "type": "command",
-        "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/pre-compact.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/pre-compact.sh"
+          }
+        ]
       }
     ]
   }

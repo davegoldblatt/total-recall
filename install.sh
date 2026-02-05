@@ -128,8 +128,8 @@ if [ -f "$SETTINGS" ]; then
     echo ""
     echo "  ! .claude/settings.local.json exists. Add hooks manually:"
     echo '    "hooks": {'
-    echo '      "SessionStart": [{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"}],'
-    echo '      "PreCompact": [{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"}]'
+    echo '      "SessionStart": [{"hooks":[{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"}]}],'
+    echo '      "PreCompact": [{"hooks":[{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"}]}]'
     echo '    }'
   fi
 else
@@ -138,14 +138,22 @@ else
   "hooks": {
     "SessionStart": [
       {
-        "type": "command",
-        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"
+          }
+        ]
       }
     ],
     "PreCompact": [
       {
-        "type": "command",
-        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"
+          }
+        ]
       }
     ]
   }
