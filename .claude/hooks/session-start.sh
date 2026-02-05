@@ -6,7 +6,8 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# Use Claude Code's project dir env var, fall back to git root or cwd
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 MEMORY_DIR="$PROJECT_ROOT/memory"
 
 # Bail if memory system isn't initialized
@@ -23,7 +24,6 @@ echo ""
 # Open loops (always relevant)
 OPEN_LOOPS="$MEMORY_DIR/registers/open-loops.md"
 if [ -f "$OPEN_LOOPS" ]; then
-  # Check if there are actual items (not just template comments)
   ACTIVE_ITEMS=$(grep -c '^\- \[ \]' "$OPEN_LOOPS" 2>/dev/null || echo "0")
   if [ "$ACTIVE_ITEMS" -gt 0 ]; then
     echo "### Open Loops ($ACTIVE_ITEMS active)"
@@ -38,7 +38,6 @@ if [ -f "$DAILY_TODAY" ]; then
   LINES=$(wc -l < "$DAILY_TODAY" | tr -d ' ')
   if [ "$LINES" -gt 5 ]; then
     echo "### Today's Log ($TODAY) — $LINES lines"
-    # Show last 20 lines as recent context
     tail -20 "$DAILY_TODAY"
     echo ""
   fi
@@ -49,13 +48,12 @@ if [ -n "$YESTERDAY" ]; then
   DAILY_YESTERDAY="$MEMORY_DIR/daily/$YESTERDAY.md"
   if [ -f "$DAILY_YESTERDAY" ]; then
     echo "### Yesterday's Log ($YESTERDAY)"
-    # Show just decisions, corrections, and commitments sections
     grep -A2 '## Decisions\|## Corrections\|## Commitments\|## Open Loops' "$DAILY_YESTERDAY" 2>/dev/null | head -20 || true
     echo ""
   fi
 fi
 
-# Word count on working memory
+# Word count warning on working memory
 if [ -f "$PROJECT_ROOT/CLAUDE.local.md" ]; then
   WORD_COUNT=$(wc -w < "$PROJECT_ROOT/CLAUDE.local.md" | tr -d ' ')
   if [ "$WORD_COUNT" -gt 1200 ]; then

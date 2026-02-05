@@ -102,36 +102,34 @@ for tmpl in "$SCRIPT_DIR/templates/registers"/*.md; do
 done
 
 # ─────────────────────────────────────────────────────────
-# 5. Hooks
+# 5. Hooks (in .claude/hooks/ — conventional location)
 # ─────────────────────────────────────────────────────────
 echo ""
 echo "Installing hooks..."
-mkdir -p "$TARGET/.claude"
+mkdir -p "$TARGET/.claude/hooks"
 
-# Copy hook scripts
-mkdir -p "$TARGET/hooks"
-for hook in "$SCRIPT_DIR/hooks"/*.sh; do
+for hook in "$SCRIPT_DIR/.claude/hooks"/*.sh; do
   filename="$(basename "$hook")"
-  if [ -f "$TARGET/hooks/$filename" ]; then
-    echo "  ~ hooks/$filename (already exists, skipping)"
+  if [ -f "$TARGET/.claude/hooks/$filename" ]; then
+    echo "  ~ .claude/hooks/$filename (already exists, skipping)"
   else
-    cp "$hook" "$TARGET/hooks/$filename"
-    chmod +x "$TARGET/hooks/$filename"
-    echo "  + hooks/$filename"
+    cp "$hook" "$TARGET/.claude/hooks/$filename"
+    chmod +x "$TARGET/.claude/hooks/$filename"
+    echo "  + .claude/hooks/$filename"
   fi
 done
 
 # Configure hooks in .claude/settings.local.json (personal, not committed)
 SETTINGS="$TARGET/.claude/settings.local.json"
 if [ -f "$SETTINGS" ]; then
-  if grep -q "total-recall" "$SETTINGS" 2>/dev/null; then
+  if grep -q "session-start\|pre-compact" "$SETTINGS" 2>/dev/null; then
     echo "  ~ .claude/settings.local.json (hooks already configured, skipping)"
   else
     echo ""
     echo "  ! .claude/settings.local.json exists. Add hooks manually:"
     echo '    "hooks": {'
-    echo '      "SessionStart": [{"type": "command", "command": "bash hooks/session-start.sh"}],'
-    echo '      "PreCompact": [{"type": "command", "command": "bash hooks/pre-compact.sh"}]'
+    echo '      "SessionStart": [{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"}],'
+    echo '      "PreCompact": [{"type":"command","command":"\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"}]'
     echo '    }'
   fi
 else
@@ -141,13 +139,13 @@ else
     "SessionStart": [
       {
         "type": "command",
-        "command": "bash hooks/session-start.sh"
+        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"
       }
     ],
     "PreCompact": [
       {
         "type": "command",
-        "command": "bash hooks/pre-compact.sh"
+        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-compact.sh"
       }
     ]
   }
@@ -211,9 +209,12 @@ echo "What auto-loads every session (deterministic):"
 echo "  .claude/rules/total-recall.md   Memory protocol"
 echo "  CLAUDE.local.md                 Working memory"
 echo ""
-echo "Hooks (configured in .claude/settings.local.json):"
+echo "Hooks (in .claude/settings.local.json):"
 echo "  SessionStart    Injects open loops + recent context"
 echo "  PreCompact      Flushes to daily log before compaction"
+echo ""
+echo "IMPORTANT: If Claude Code is already running, restart it or"
+echo "run /hooks to review and activate the new hooks."
 echo ""
 echo "Commands:"
 echo "  /recall-write <note>    Save to daily log (promotes on request)"

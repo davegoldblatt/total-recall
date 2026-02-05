@@ -2,15 +2,15 @@
 # Total Recall — PreCompact Hook
 #
 # Fires before context compaction. Writes a compaction marker to today's
-# daily log and attempts to extract recent context from the transcript.
+# daily log and extracts recent user turns from the transcript.
 #
-# This is a safety net — the protocol in .claude/rules/ also instructs
-# Claude to flush before compaction, but this hook ensures at minimum
-# a marker and recent turns get captured even if Claude doesn't.
+# Hook input: JSON object on stdin with transcript_path field.
+# Transcript file: JSONL (one JSON object per line).
 
 set -euo pipefail
 
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# Use Claude Code's project dir env var, fall back to git root or cwd
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 MEMORY_DIR="$PROJECT_ROOT/memory"
 TODAY="$(date +%Y-%m-%d)"
 NOW="$(date +%H:%M)"
@@ -38,19 +38,15 @@ if [ ! -f "$DAILY" ]; then
 EOF
 fi
 
-# Read the transcript from stdin if provided
-# PreCompact hook receives JSON on stdin with transcript info
+# Read hook input from stdin (JSON with transcript_path)
 TRANSCRIPT_PATH=""
 if ! [ -t 0 ]; then
   INPUT=$(cat)
-  # Try to extract transcript_path from JSON input
   TRANSCRIPT_PATH=$(echo "$INPUT" | python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
-    # Navigate possible JSON structures
-    if isinstance(data, dict):
-        print(data.get('transcript_path', data.get('transcriptPath', '')))
+    print(data.get('transcript_path', ''))
 except:
     pass
 " 2>/dev/null || echo "")
@@ -61,14 +57,13 @@ echo "" >> "$DAILY"
 echo "## [pre-compact $NOW]" >> "$DAILY"
 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-  # Extract last few user messages from the JSONL transcript as context breadcrumbs
   echo "" >> "$DAILY"
   echo "Recent context before compaction:" >> "$DAILY"
   echo "" >> "$DAILY"
 
-  # Get the last 10 user turns from the transcript
+  # Transcript is JSONL — one JSON object per line
   python3 -c "
-import json, sys
+import json
 
 turns = []
 try:
@@ -79,29 +74,25 @@ try:
                 continue
             try:
                 entry = json.loads(line)
-                role = entry.get('role', '')
-                if role == 'user':
-                    content = entry.get('content', '')
-                    if isinstance(content, list):
-                        texts = [b.get('text', '') for b in content if b.get('type') == 'text']
-                        content = ' '.join(texts)
-                    if isinstance(content, str) and content.strip():
-                        # Truncate long messages
-                        text = content.strip()[:200]
-                        turns.append(text)
             except json.JSONDecodeError:
                 continue
+            role = entry.get('role', '')
+            if role == 'user':
+                content = entry.get('content', '')
+                if isinstance(content, list):
+                    texts = [b.get('text', '') for b in content if b.get('type') == 'text']
+                    content = ' '.join(texts)
+                if isinstance(content, str) and content.strip():
+                    turns.append(content.strip()[:200])
 except Exception:
     pass
 
-# Print last 5 user messages
 for t in turns[-5:]:
     print(f'- {t}')
 " >> "$DAILY" 2>/dev/null || echo "- (could not extract transcript context)" >> "$DAILY"
 
 else
   echo "- Compaction occurred. No transcript available for extraction." >> "$DAILY"
-  echo "- Check that any unsaved decisions/corrections were flushed above." >> "$DAILY"
 fi
 
 echo "" >> "$DAILY"

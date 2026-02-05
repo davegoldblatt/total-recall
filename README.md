@@ -36,9 +36,12 @@ cd total-recall
 Or manually:
 1. Copy `.claude/commands/recall-*.md` → your project's `.claude/commands/`
 2. Copy `.claude/rules/total-recall.md` → your project's `.claude/rules/`
-3. Copy `templates/CLAUDE.local.md` → your project root as `CLAUDE.local.md`
-4. Copy `templates/SCHEMA.md` + `templates/registers/` → `memory/` in your project
-5. Copy `hooks/` → your project's `hooks/` and configure in `.claude/settings.local.json`
+3. Copy `.claude/hooks/*.sh` → your project's `.claude/hooks/`
+4. Copy `templates/CLAUDE.local.md` → your project root as `CLAUDE.local.md`
+5. Copy `templates/SCHEMA.md` + `templates/registers/` → `memory/` in your project
+6. Configure hooks in `.claude/settings.local.json` (see below)
+
+**After installing:** If Claude Code is already running, restart it or run `/hooks` to review and activate the new hooks. Claude Code snapshots hooks at startup — changes to settings files require restart or `/hooks` review.
 
 ## What Auto-Loads (Deterministic)
 
@@ -51,7 +54,7 @@ These use Claude Code's native mechanisms — they load every session without an
 
 ## Hooks
 
-Configured in `.claude/settings.local.json`:
+Hook scripts live in `.claude/hooks/` and are configured in `.claude/settings.local.json`. They use `$CLAUDE_PROJECT_DIR` to resolve paths portably.
 
 | Hook | When | What |
 |------|------|------|
@@ -59,6 +62,8 @@ Configured in `.claude/settings.local.json`:
 | **PreCompact** | Before compaction | Flushes conversation context to daily log |
 
 The hooks are safety nets. The protocol in `.claude/rules/` also instructs Claude on these behaviors — hooks ensure it happens even if the protocol isn't followed.
+
+**Note:** Claude Code snapshots hooks at startup. If you install hooks while a session is running, restart Claude Code or run `/hooks` to review and activate them.
 
 ## Commands
 
@@ -127,10 +132,10 @@ your-project/
 │   │   └── recall-context.md    # /recall-context
 │   ├── rules/
 │   │   └── total-recall.md      # Protocol (auto-loaded)
+│   ├── hooks/
+│   │   ├── session-start.sh     # SessionStart hook
+│   │   └── pre-compact.sh       # PreCompact hook
 │   └── settings.local.json      # Hook configuration
-├── hooks/
-│   ├── session-start.sh         # SessionStart hook
-│   └── pre-compact.sh           # PreCompact hook
 ├── memory/
 │   ├── SCHEMA.md                # Protocol documentation
 │   ├── daily/
