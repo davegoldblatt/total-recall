@@ -1,3 +1,6 @@
+---
+description: Show memory system health — word counts, stale entries, hook status, recommendations.
+---
 Show the health and status of the memory system.
 
 ## What To Do

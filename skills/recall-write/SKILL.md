@@ -1,3 +1,8 @@
+---
+description: Write a note to memory with write gate evaluation. Only saves behavior-changing facts.
+argument-hint: <note>
+disable-model-invocation: true
+---
 Write a note to memory, applying the write gate. Default destination: daily log.
 
 The user's note: $ARGUMENTS

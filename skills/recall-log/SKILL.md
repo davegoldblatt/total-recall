@@ -1,3 +1,8 @@
+---
+description: Quick append to daily log without write gate evaluation.
+argument-hint: <note>
+disable-model-invocation: true
+---
 Quick append to today's daily log. No write gate — raw capture.
 
 Note to log: $ARGUMENTS

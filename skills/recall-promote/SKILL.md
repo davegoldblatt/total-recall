@@ -1,3 +1,7 @@
+---
+description: Review daily logs and promote entries to registers or working memory.
+disable-model-invocation: true
+---
 Review recent daily logs and surface candidates for promotion to registers or MEMORY.md.
 
 ## What To Do

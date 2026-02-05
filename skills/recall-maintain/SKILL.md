@@ -1,3 +1,7 @@
+---
+description: Verify stale memory entries, find contradictions, prune working memory.
+disable-model-invocation: true
+---
 Run maintenance on the memory system: verify stale entries, find contradictions, clean up.
 
 ## What To Do

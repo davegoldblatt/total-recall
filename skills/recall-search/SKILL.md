@@ -1,3 +1,7 @@
+---
+description: Search across all memory tiers (registers, daily logs, archive) for relevant information.
+argument-hint: <query>
+---
 Search across all memory tiers for relevant information.
 
 Query: $ARGUMENTS

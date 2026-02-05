@@ -117,13 +117,7 @@ Archive (memory/archive/)
 
 Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths portably. All hooks fail open — errors never block Claude Code.
 
-**Transcript extraction is opt-in.** By default, the PreCompact hook only writes a timestamp marker. To enable extracting recent user messages from the conversation transcript (useful for preserving context across compaction), set:
-
-```bash
-export RECALL_EXTRACT_TRANSCRIPT=1
-```
-
-This is off by default to comply with Anthropic's directory policy on conversation data.
+**No transcript parsing.** The PreCompact hook only writes a timestamp marker to the daily log. It does not read or parse conversation transcripts. This complies with Anthropic's directory policy on conversation data.
 
 ## What Auto-Loads (Deterministic)
 
@@ -212,7 +206,7 @@ Total Recall complements [Superpowers](https://github.com/superpowers-ai/superpo
 - `CLAUDE.local.md` is automatically gitignored (personal working memory)
 - `memory/` may contain preferences, people context, project decisions — consider adding to `.gitignore` for personal projects
 - `.claude/settings.local.json` is personal hook config (not committed)
-- Transcript extraction (reading conversation history) is **off by default** — opt-in via `RECALL_EXTRACT_TRANSCRIPT=1`
+- **No transcript parsing** — hooks never read conversation history or transcripts
 - Hooks only read/write files inside your project's `memory/` directory
 - To audit: all hook code is in `hooks/*.sh`, all memory is in `memory/` — plain text, fully inspectable
 - To uninstall: remove `memory/`, `CLAUDE.local.md`, and the `.claude/` entries (or `/plugin uninstall recall`)

@@ -1,3 +1,8 @@
+---
+description: Mark memory entries as superseded. Preserves history, does not delete.
+argument-hint: <query>
+disable-model-invocation: true
+---
 Mark memory entries matching a query as superseded. Does not delete — preserves history.
 
 Query to forget: $ARGUMENTS

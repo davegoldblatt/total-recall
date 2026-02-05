@@ -1,3 +1,7 @@
+---
+description: Scaffold the Total Recall memory directory structure in this project.
+disable-model-invocation: true
+---
 Initialize the Total Recall memory system in this project.
 
 ## What To Do

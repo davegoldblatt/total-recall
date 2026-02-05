@@ -1,3 +1,6 @@
+---
+description: Show what memory files are loaded and available in the current session.
+---
 Show what memory context is currently available in this session.
 
 ## What To Do
