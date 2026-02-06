@@ -203,13 +203,50 @@ Total Recall complements [Superpowers](https://github.com/superpowers-ai/superpo
 
 - **Local only. No network calls. No telemetry. No external dependencies.**
 - All memory is stored as plain markdown files in your project directory
-- `CLAUDE.local.md` is automatically gitignored (personal working memory)
-- `memory/` is automatically gitignored (contains preferences, people context, project decisions)
-- `.claude/settings.local.json` is personal hook config (not committed)
 - **No transcript parsing** — hooks never read conversation history or transcripts
 - Hooks only read/write files inside your project's `memory/` directory
 - To audit: all hook code is in `hooks/*.sh`, all memory is in `memory/` — plain text, fully inspectable
 - To uninstall: remove `memory/`, `CLAUDE.local.md`, and the `.claude/` entries (or `/plugin uninstall recall`)
+
+### What's gitignored by default
+
+The installer adds a labeled block to `.gitignore`:
+
+```gitignore
+# Total Recall (local memory — see README for team mode)
+CLAUDE.local.md
+.claude/settings.local.json
+memory/
+```
+
+Nothing leaks into git. This is the safe default for personal and work repos.
+
+### Team mode (shared memory)
+
+If your team wants to version shared decisions and project context while keeping personal notes local, replace the `memory/` line with a selective pattern:
+
+```gitignore
+# Total Recall (team mode)
+CLAUDE.local.md
+.claude/settings.local.json
+
+# ignore all memory by default
+memory/**
+
+# but allow team-shared registers
+!memory/registers/
+!memory/registers/decisions.md
+!memory/registers/projects.md
+!memory/registers/tech-stack.md
+
+# keep private registers ignored
+memory/registers/people.md
+memory/registers/preferences.md
+memory/daily/
+memory/archive/
+```
+
+This commits "why we chose X over Y" without accidentally committing daily logs or personal preferences.
 
 ## License
 

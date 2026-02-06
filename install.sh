@@ -64,19 +64,23 @@ else
   echo "  + CLAUDE.local.md (auto-loads every session, personal memory)"
 fi
 
-# Add CLAUDE.local.md and memory/ to .gitignore
+# Add Total Recall entries to .gitignore
+GITIGNORE_BLOCK="# Total Recall (local memory — see README for team mode)
+CLAUDE.local.md
+.claude/settings.local.json
+memory/"
+
 if [ -f "$TARGET/.gitignore" ]; then
-  if ! grep -q "CLAUDE.local.md" "$TARGET/.gitignore" 2>/dev/null; then
-    echo "CLAUDE.local.md" >> "$TARGET/.gitignore"
-    echo "  + Added CLAUDE.local.md to .gitignore"
-  fi
-  if ! grep -q "^memory/" "$TARGET/.gitignore" 2>/dev/null; then
-    echo "memory/" >> "$TARGET/.gitignore"
-    echo "  + Added memory/ to .gitignore"
+  if grep -q "Total Recall" "$TARGET/.gitignore" 2>/dev/null; then
+    echo "  ~ .gitignore already has Total Recall block (skipping)"
+  else
+    echo "" >> "$TARGET/.gitignore"
+    echo "$GITIGNORE_BLOCK" >> "$TARGET/.gitignore"
+    echo "  + Added Total Recall block to .gitignore"
   fi
 else
-  printf "CLAUDE.local.md\nmemory/\n" > "$TARGET/.gitignore"
-  echo "  + Created .gitignore with CLAUDE.local.md and memory/"
+  echo "$GITIGNORE_BLOCK" > "$TARGET/.gitignore"
+  echo "  + Created .gitignore with Total Recall defaults"
 fi
 
 # ─────────────────────────────────────────────────────────
