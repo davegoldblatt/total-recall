@@ -183,7 +183,7 @@ your-project/
 
 ## Works With Superpowers
 
-Total Recall complements [Superpowers](https://github.com/superpowers-ai/superpowers). No conflicts:
+Total Recall complements [Superpowers](https://github.com/obra/superpowers). No conflicts:
 
 | Superpowers | Total Recall |
 |-------------|-------------|
