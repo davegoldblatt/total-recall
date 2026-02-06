@@ -64,15 +64,19 @@ else
   echo "  + CLAUDE.local.md (auto-loads every session, personal memory)"
 fi
 
-# Add CLAUDE.local.md to .gitignore
+# Add CLAUDE.local.md and memory/ to .gitignore
 if [ -f "$TARGET/.gitignore" ]; then
   if ! grep -q "CLAUDE.local.md" "$TARGET/.gitignore" 2>/dev/null; then
     echo "CLAUDE.local.md" >> "$TARGET/.gitignore"
     echo "  + Added CLAUDE.local.md to .gitignore"
   fi
+  if ! grep -q "^memory/" "$TARGET/.gitignore" 2>/dev/null; then
+    echo "memory/" >> "$TARGET/.gitignore"
+    echo "  + Added memory/ to .gitignore"
+  fi
 else
-  echo "CLAUDE.local.md" > "$TARGET/.gitignore"
-  echo "  + Created .gitignore with CLAUDE.local.md"
+  printf "CLAUDE.local.md\nmemory/\n" > "$TARGET/.gitignore"
+  echo "  + Created .gitignore with CLAUDE.local.md and memory/"
 fi
 
 # ─────────────────────────────────────────────────────────

@@ -204,7 +204,7 @@ Total Recall complements [Superpowers](https://github.com/superpowers-ai/superpo
 - **Local only. No network calls. No telemetry. No external dependencies.**
 - All memory is stored as plain markdown files in your project directory
 - `CLAUDE.local.md` is automatically gitignored (personal working memory)
-- `memory/` may contain preferences, people context, project decisions — consider adding to `.gitignore` for personal projects
+- `memory/` is automatically gitignored (contains preferences, people context, project decisions)
 - `.claude/settings.local.json` is personal hook config (not committed)
 - **No transcript parsing** — hooks never read conversation history or transcripts
 - Hooks only read/write files inside your project's `memory/` directory
