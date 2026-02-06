@@ -104,7 +104,7 @@ Before the session ends or if you sense the conversation is getting long:
 
 If `recall_suggestions` in CLAUDE.local.md is `off`, never suggest memory candidates unprompted.
 
-If `recall_suggestions` is `low` (default), you MAY append a small footer to your response with up to **2 candidates per session**, and only when the user does one of these:
+If `recall_suggestions` is `low` (opt-in), you MAY append a small footer to your response with up to **2 candidates per session**, and only when the user does one of these:
 
 - **Corrects you** — explicit "no, it's X"
 - **Makes a commitment** — deadline, deliverable, follow-up

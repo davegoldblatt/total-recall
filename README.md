@@ -2,23 +2,57 @@
 
 **Curated** persistent memory for Claude Code. Not auto-ingest — a write gate that asks *"Does this change future behavior?"* before anything gets saved.
 
-Other memory tools dump everything into context. Total Recall does the opposite: it filters aggressively, captures to a daily log first, and only promotes to long-term memory when you say so. The result is a lean, trustworthy memory that doesn't bloat your context window with noise.
+## Start here (2 minutes)
 
-## Install
+Total Recall gives Claude Code a small, curated notebook in your repo so you stop re-teaching the same preferences, decisions, and constraints every session.
 
-**As a plugin** (recommended):
+### Install (plugin)
+
+In Claude Code:
 
 ```
 /plugin marketplace add davegoldblatt/recall-marketplace
 /plugin install recall@recall-marketplace
 ```
 
-**Or standalone** (copies files into your project's `.claude/` directory):
+### Install (standalone)
 
 ```bash
 git clone https://github.com/davegoldblatt/total-recall.git
 cd total-recall
 ./install.sh /path/to/your/project
+```
+
+### Initialize
+
+Use whichever matches your install mode:
+
+```
+/recall:recall-init    # plugin
+/recall-init           # standalone
+```
+
+### The holy-fuck demo
+
+1. Save a preference that should change future behavior:
+
+```
+/recall:recall-write Default output: short bullet points. No long paragraphs.
+/recall-write Default output: short bullet points. No long paragraphs.
+```
+
+2. Close Claude Code. Re-open it in the same repo.
+
+3. Ask: *"Summarize this repo's README."*
+
+If Total Recall is working, Claude defaults to short bullet points without you repeating yourself.
+
+### Turn off recall nudges
+
+Open `CLAUDE.local.md` in your project and set:
+
+```
+recall_suggestions: off
 ```
 
 After installing: restart Claude Code or run `/hooks` to activate hooks. Claude Code snapshots hooks at startup.
@@ -106,7 +140,7 @@ Archive (memory/archive/)
 
 **Correction Gate** — Human corrections get highest priority. One correction triggers writes to daily log + register + working memory.
 
-**Recall Nudges** — Optional, off-by-default behavior where Claude appends a small footer suggesting a memory candidate when you make a correction, commitment, decision, or state a durable preference. Max 2 per session, never mid-response, never during code output. Controlled by `recall_suggestions: low | off` in `CLAUDE.local.md`.
+**Recall Nudges** — Optional. Default is off. If you enable `recall_suggestions: low`, Claude can append a tiny footer suggesting a memory candidate on corrections, commitments, decisions-with-rationale, or durable preferences. Max 2 per session. Never mid-response. Never during code-only output.
 
 ## Hooks
 
