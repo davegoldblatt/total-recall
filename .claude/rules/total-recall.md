@@ -123,7 +123,8 @@ Format:
 ```
 ---
 Recall candidate: "<candidate text>"
-→ /recall-write <candidate text>
+→ /recall:recall-write <candidate text>  (plugin)
+→ /recall-write <candidate text>  (standalone)
 ```
 
 ---
