@@ -4,6 +4,10 @@
 > ~1500 word limit. Only behavior-changing facts earn a place here.
 > Last updated: YYYY-MM-DD
 
+## Total Recall Settings
+
+recall_suggestions: low  # off | low
+
 ## Active Context
 
 **Current Focus**: [not yet set]

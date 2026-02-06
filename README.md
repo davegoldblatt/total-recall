@@ -106,6 +106,8 @@ Archive (memory/archive/)
 
 **Correction Gate** — Human corrections get highest priority. One correction triggers writes to daily log + register + working memory.
 
+**Recall Nudges** — Optional, off-by-default behavior where Claude appends a small footer suggesting a memory candidate when you make a correction, commitment, decision, or state a durable preference. Max 2 per session, never mid-response, never during code output. Controlled by `recall_suggestions: low | off` in `CLAUDE.local.md`.
+
 ## Hooks
 
 | Hook | When | What |

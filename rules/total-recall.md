@@ -100,6 +100,34 @@ Before the session ends or if you sense the conversation is getting long:
 
 ---
 
+## Recall Nudges (Optional)
+
+If `recall_suggestions` in CLAUDE.local.md is `off`, never suggest memory candidates unprompted.
+
+If `recall_suggestions` is `low` (default), you MAY append a small footer to your response with up to **2 candidates per session**, and only when the user does one of these:
+
+- **Corrects you** — explicit "no, it's X"
+- **Makes a commitment** — deadline, deliverable, follow-up
+- **Makes a decision with rationale** — "we chose A because B"
+- **States a durable preference** — "always do X", "never do Y"
+
+Rules:
+- Candidates must be **literal paraphrases**, not inferences. Quote what the user said.
+- If you are not confident the item passes the write gate, do not suggest.
+- **Never interrupt the main response.** Append at the very end as a small footer block.
+- **Skip during code-only answers.** If the response is pure code output, no nudge.
+- After 2 nudges in a session, stop. Do not nudge again until the next session.
+
+Format:
+
+```
+---
+Recall candidate: "<candidate text>"
+→ /recall-write <candidate text>
+```
+
+---
+
 ## Key Rules
 
 - Before answering questions about history/preferences: **SEARCH MEMORY FIRST**
