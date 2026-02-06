@@ -6,7 +6,7 @@
 
 ## Total Recall Settings
 
-recall_suggestions: low  # off | low
+recall_suggestions: off  # off | low (set to "low" to enable nudges)
 
 ## Active Context
 
