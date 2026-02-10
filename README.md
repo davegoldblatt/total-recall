@@ -1,170 +1,177 @@
 # Total Recall
 
-**Curated** persistent memory for Claude Code. Not auto-ingest — a write gate that asks *"Does this change future behavior?"* before anything gets saved.
+A memory system for Claude Code that remembers what matters and forgets what doesn't.
 
-## Start here (2 minutes)
+## The Problem
 
-Total Recall gives Claude Code a small, curated notebook in your repo so you stop re-teaching the same preferences, decisions, and constraints every session.
+Claude Code forgets everything between sessions. Every time you start a new conversation, it's like talking to someone with amnesia. You end up repeating yourself:
 
-### Install (plugin)
+- "We already tried that approach, it didn't work."
+- "Don't touch the auth file."
+- "I prefer tabs over spaces."
+- "The client's name is Sarah, not Sara."
 
-In Claude Code:
+This gets old fast.
+
+## What Total Recall Does
+
+It gives Claude Code a notepad that carries over between sessions, but a *picky* notepad. Not everything goes in. Before anything gets saved permanently, it has to pass a simple test: **will this matter tomorrow?**
+
+A preference you'll have for months? Saved. A decision you made and why? Saved. The fact that you ran a test five minutes ago? Not saved. The system keeps itself clean so Claude isn't wading through junk to find what's relevant.
+
+## How It Works
+
+Think of it like a kitchen with four storage areas:
+
+**Counter** (`CLAUDE.local.md`): The stuff you reach for every day. Loads automatically, every session. Kept small on purpose, around a page of text.
+
+**Pantry** (`memory/registers/`): Organized by category. Your preferences, key decisions, project details, people you work with. Claude checks here when it needs something specific.
+
+**Daily notebook** (`memory/daily/`): Timestamped scratch notes from each day. Everything gets written here first. You decide later what's worth keeping permanently.
+
+**Storage closet** (`memory/archive/`): Old stuff that's done or outdated. Still searchable, but never loaded automatically.
+
+The key idea: **notes hit the daily notebook first, then you promote the keepers.** Claude doesn't get to decide on its own what's important enough to remember permanently. You do.
+
+## Quick Start
+
+### Install as a plugin (recommended)
 
 ```
 /plugin marketplace add davegoldblatt/recall-marketplace
 /plugin install recall@recall-marketplace
 ```
 
-### Install (standalone)
+### Or install standalone
 
-```bash
+```
 git clone https://github.com/davegoldblatt/total-recall.git
 cd total-recall
 ./install.sh /path/to/your/project
 ```
 
-### Initialize
+After installing, restart Claude Code or run `/hooks` to activate.
 
-Use whichever matches your install mode:
+## Using It
 
-```
-/recall:recall-init    # plugin
-/recall-init           # standalone
-```
+Here's your day-to-day:
 
-### The holy-fuck demo
+**Claude notices something worth remembering.** It writes to your daily notebook and tells you. You don't have to do anything.
 
-1. Save a preference that should change future behavior:
+**You want Claude to remember something.** Just say "remember this" or use the write command:
 
 ```
-/recall:recall-write Default output: short bullet points. No long paragraphs.
-/recall-write Default output: short bullet points. No long paragraphs.
+/recall-write Dave prefers concise error messages, no stack traces in prod
 ```
 
-2. Close Claude Code. Re-open it in the same repo.
-
-3. Ask: *"Summarize this repo's README."*
-
-If Total Recall is working, Claude defaults to short bullet points without you repeating yourself.
-
-### Turn off recall nudges
-
-Open `CLAUDE.local.md` in your project and set:
+**End of day (or whenever).** Review what piled up and promote the good stuff:
 
 ```
-recall_suggestions: off
+/recall-promote
 ```
 
-After installing: restart Claude Code or run `/hooks` to activate hooks. Claude Code snapshots hooks at startup.
+**Find something from last week.** Search across everything:
 
-## Why a Write Gate?
+```
+/recall-search authentication decision
+```
 
-Most memory systems have a capture problem — they save too much. Every observation, every intermediate thought, every transient detail gets persisted. Your context fills with stale facts and the model starts hallucinating from its own outdated notes.
+**You correct Claude.** The correction updates everywhere at once: daily notebook, registers, and the counter. The same mistake won't happen again.
 
-Total Recall's write gate is a five-point filter:
-
-1. **Does it change future behavior?** (preference, boundary, recurring pattern)
-2. **Is it a commitment with consequences?** (deadline, deliverable, follow-up)
-3. **Is it a decision with rationale?** (why X over Y, worth preserving)
-4. **Is it a stable fact that will matter again?** (not transient, not obvious)
-5. **Did the user explicitly say "remember this"?**
-
-If none are true, it doesn't get saved. Period.
-
-## How It Works
-
-**Four tiers of memory, two loaded deterministically:**
-
-| Tier | What | How It Loads |
-|------|------|-------------|
-| Working Memory | `CLAUDE.local.md` — essential context, ~1500 words | **Auto-loaded** by Claude Code |
-| Registers | `memory/registers/*.md` — structured domain knowledge | On demand (searched when relevant) |
-| Daily Logs | `memory/daily/YYYY-MM-DD.md` — timestamped raw capture | Checked on session start |
-| Archive | `memory/archive/` — completed/superseded items | On search |
-
-**The protocol** lives in `.claude/rules/total-recall.md` (standalone) or `rules/total-recall.md` (plugin) and **auto-loads** every session — no "please remember to follow these rules" needed.
-
-**All writes go to the daily log first.** Promotion to registers is a separate, user-controlled step via `/recall-promote`. This prevents the model from prematurely solidifying inferences.
-
-**Corrections propagate immediately.** When you correct Claude, it updates the daily log + register + working memory in one shot. The same mistake never recurs.
-
-## Commands
-
-When installed as a plugin, commands are namespaced: `/recall:recall-write`. Standalone install uses `/recall-write`.
+### All Commands
 
 | Command | What it does |
-|---------|-------------|
-| `recall-init` | Scaffold the memory directory structure |
-| `recall-write <note>` | Write to daily log with gate evaluation (suggests promotion) |
-| `recall-log <note>` | Quick append to daily log (no gate) |
-| `recall-search <query>` | Search across all memory tiers |
-| `recall-promote` | Review daily logs, promote to registers |
-| `recall-status` | Memory system health check |
-| `recall-maintain` | Verify stale entries, prune, clean up |
-| `recall-forget <query>` | Mark entries as superseded |
-| `recall-context` | Show what memory is loaded this session |
+|---|---|
+| `/recall-init` | Set up the memory folders for the first time |
+| `/recall-write <note>` | Save a note (checks if it's worth keeping, suggests where) |
+| `/recall-log <note>` | Quick note to the daily notebook, no questions asked |
+| `/recall-search <query>` | Search everything |
+| `/recall-promote` | Review daily notes, move the keepers to registers |
+| `/recall-status` | Health check. Is everything working? |
+| `/recall-maintain` | Clean up stale or duplicate entries |
+| `/recall-forget <query>` | Mark something as outdated |
+| `/recall-context` | Show what memory Claude has loaded right now |
+
+If installed as a plugin, commands are namespaced: `/recall:recall-write` instead of `/recall-write`.
+
+## The Write Gate
+
+This is the core idea. Before anything gets promoted to permanent memory, it has to pass at least one of these checks:
+
+1. **Will it change how Claude behaves next time?** (a preference, a boundary, a pattern)
+2. **Is it a commitment someone's counting on?** (a deadline, a deliverable, a follow-up)
+3. **Is it a decision worth remembering the reasoning for?** (why you picked X over Y)
+4. **Is it a stable fact that'll come up again?** (not something that'll be different tomorrow)
+5. **Did you explicitly say "remember this"?**
+
+If none of those are true, it stays in the daily notebook and eventually ages out. This keeps memory lean. No junk drawer.
+
+## When Corrections Happen
+
+If you tell Claude it got something wrong, it doesn't just say "sorry" and move on. It updates the daily notebook, the relevant register, and the counter, all in one shot. The old information gets marked as superseded (not deleted) so there's a trail of what changed and when.
+
+## What Loads Automatically
+
+Only two things, every session:
+
+| What | Where | How |
+|---|---|---|
+| The rules (write gate, correction protocol) | `rules/total-recall.md` | Claude Code loads all rules files automatically |
+| Counter / working memory | `CLAUDE.local.md` | Claude Code loads this automatically |
+
+Everything else loads on demand: when you search, when it's relevant, or at session start via hooks.
+
+## Hooks
+
+Two things happen automatically in the background:
+
+**When a session starts:** Claude gets a summary of open items and recent daily notes. This is the "here's where we left off" briefing.
+
+**Before memory gets compacted:** A timestamp gets written to the daily notebook so there's a record. This one is silent. Claude doesn't see it, it's just bookkeeping.
+
+Both hooks fail safely. If something goes wrong, they don't block Claude Code from working.
+
+Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths. No transcript parsing. The PreCompact hook only writes a timestamp marker to the daily log. It does not read or parse conversation transcripts.
 
 ## Architecture
 
+For those who want the technical details.
+
 ```
-Conversation (ephemeral — compacted/discarded)
-    │
-    ▼ WRITE GATE: "Does this change future behavior?"
-    │
+Conversation (ephemeral, compacted/discarded)
+    |
+    v  WRITE GATE: "Does this change future behavior?"
+    |
 Daily Log (memory/daily/YYYY-MM-DD.md)
     All writes land here first. Raw, timestamped.
-    │
-    ▼ PROMOTION: user-controlled via /recall-promote
-    │
+    |
+    v  PROMOTION: user-controlled via /recall-promote
+    |
 Registers (memory/registers/*.md)
     Structured claims with metadata (confidence, evidence, last_verified)
-    │
-    ▼ DISTILLATION: only what's essential for every session
-    │
+    |
+    v  DISTILLATION: only what's essential for every session
+    |
 Working Memory (CLAUDE.local.md)
     ~1500 words. Auto-loaded. The persistent "personality."
-    │
-    ▼ EXPIRY
-    │
+    |
+    v  EXPIRY
+    |
 Archive (memory/archive/)
     Searchable history. Never auto-loaded.
 ```
 
 ### Key Mechanisms
 
-**Write Gate** — Filters out noise. Only behavior-changing facts, commitments, decisions, and explicit "remember this" requests pass through.
+**Write Gate:** Filters out noise. Only behavior-changing facts, commitments, decisions, and explicit "remember this" requests pass through.
 
-**Daily Log First** — All writes land in the daily log. Promotion to registers is a separate step, controlled by the user. This prevents the model from prematurely solidifying inferences.
+**Daily Log First:** All writes land in the daily log. Promotion to registers is a separate step, controlled by the user. This prevents the model from prematurely solidifying inferences.
 
-**Contradiction Protocol** — Never silently overwrites. Old claims are marked `[superseded]` with date and reason. The pattern of change is preserved.
+**Contradiction Protocol:** Never silently overwrites. Old claims are marked `[superseded]` with date and reason. The pattern of change is preserved.
 
-**Correction Gate** — Human corrections get highest priority. One correction triggers writes to daily log + register + working memory.
+**Correction Gate:** Human corrections get highest priority. One correction triggers writes to daily log + register + working memory.
 
-**Recall Nudges** — Optional. Default is off. If you enable `recall_suggestions: low`, Claude can append a tiny footer suggesting a memory candidate on corrections, commitments, decisions-with-rationale, or durable preferences. Max 2 per session. Never mid-response. Never during code-only output.
-
-## Hooks
-
-| Hook | When | What |
-|------|------|------|
-| **SessionStart** | Session begins | Injects open loops + recent daily log highlights into Claude's context |
-| **PreCompact** | Before compaction | Writes compaction marker to daily log (file write only, not injected) |
-
-**How they differ:** SessionStart stdout is injected as model-visible context — Claude sees it. PreCompact stdout is not visible to the model; it only writes files to disk. This is by design: SessionStart primes the session, PreCompact preserves a record.
-
-Hooks use `$CLAUDE_PROJECT_DIR` (standalone) or `${CLAUDE_PLUGIN_ROOT}` (plugin) to resolve paths portably. All hooks fail open — errors never block Claude Code.
-
-**No transcript parsing.** The PreCompact hook only writes a timestamp marker to the daily log. It does not read or parse conversation transcripts. This complies with Anthropic's directory policy on conversation data.
-
-## What Auto-Loads (Deterministic)
-
-These use Claude Code's native mechanisms — they load every session without any prompting:
-
-| File | Mechanism | Purpose |
-|------|-----------|---------|
-| `rules/total-recall.md` | `.claude/rules/` auto-discovery | Write gate, correction protocol, session behavior |
-| `CLAUDE.local.md` | Claude Code local memory | Working memory (~1500 words, gitignored) |
-
-## File Structure
+### File Structure
 
 **Plugin format** (installed via `/plugin install`):
 
@@ -206,9 +213,9 @@ your-project/
 └── CLAUDE.local.md               # Working memory (gitignored)
 ```
 
-## Compared to Other Memory Tools
+### Compared to Other Memory Tools
 
-| | Total Recall | Auto-ingest tools |
+|  | Total Recall | Auto-ingest tools |
 |---|---|---|
 | **What gets saved** | Only what passes the write gate | Everything |
 | **Default destination** | Daily log (promote later) | Permanent storage |
@@ -217,72 +224,19 @@ your-project/
 | **User control** | Promotion is explicit | Automatic |
 | **Architecture** | 4-tier with metadata | Flat or 2-tier |
 
-## Works With Superpowers
+## Privacy
 
-Total Recall complements [Superpowers](https://github.com/obra/superpowers). No conflicts:
+- Everything is local. No network calls, no telemetry, no external services.
+- All memory is plain markdown files you can read and edit yourself.
+- `CLAUDE.local.md` is gitignored by default (it's personal).
+- `memory/` is gitignored by default (it can contain personal notes).
+- Hooks never read your conversation transcripts.
+- To see exactly what's happening: check `hooks/*.sh` and `memory/`. It's all plain text.
+- To uninstall: delete `memory/`, `CLAUDE.local.md`, and the `.claude/` entries (or `/plugin uninstall recall`).
 
-| Superpowers | Total Recall |
-|-------------|-------------|
-| How to work (methodology) | What to remember (persistence) |
-| Plans in `docs/plans/` | Memory in `memory/` |
-| TDD enforcement | Write gate enforcement |
+## Works Alongside Superpowers
 
-## Design Principles
-
-- **Memory that doesn't change future behavior shouldn't exist**
-- **Daily log first** — capture safely, promote deliberately
-- Human corrections propagate immediately and permanently
-- Deterministic loading via native Claude Code mechanisms
-- Transparent markdown files, not a black-box database
-
-## Privacy & Security
-
-- **Local only. No network calls. No telemetry. No external dependencies.**
-- All memory is stored as plain markdown files in your project directory
-- **No transcript parsing** — hooks never read conversation history or transcripts
-- Hooks only read/write files inside your project's `memory/` directory
-- To audit: all hook code is in `hooks/*.sh`, all memory is in `memory/` — plain text, fully inspectable
-- To uninstall: remove `memory/`, `CLAUDE.local.md`, and the `.claude/` entries (or `/plugin uninstall recall`)
-
-### What's gitignored by default
-
-The installer adds a labeled block to `.gitignore`:
-
-```gitignore
-# Total Recall (local memory — see README for team mode)
-CLAUDE.local.md
-.claude/settings.local.json
-memory/
-```
-
-Nothing leaks into git. This is the safe default for personal and work repos.
-
-### Team mode (shared memory)
-
-If your team wants to version shared decisions and project context while keeping personal notes local, replace the `memory/` line with a selective pattern:
-
-```gitignore
-# Total Recall (team mode)
-CLAUDE.local.md
-.claude/settings.local.json
-
-# ignore all memory by default
-memory/**
-
-# but allow team-shared registers
-!memory/registers/
-!memory/registers/decisions.md
-!memory/registers/projects.md
-!memory/registers/tech-stack.md
-
-# keep private registers ignored
-memory/registers/people.md
-memory/registers/preferences.md
-memory/daily/
-memory/archive/
-```
-
-This commits "why we chose X over Y" without accidentally committing daily logs or personal preferences.
+If you use [Superpowers](https://github.com/obra/superpowers), there are no conflicts. Superpowers handles *how* Claude works (methodology, TDD, plans). Total Recall handles *what* Claude remembers. Different jobs, same project.
 
 ## License
 
