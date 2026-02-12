@@ -1,7 +1,7 @@
 {
   "name": "recall",
   "description": "Curated persistent memory for Claude Code. Write gate prevents bloat — only behavior-changing facts get saved. Tiered architecture: daily logs, structured registers, and auto-loaded working memory.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Dave Goldblatt",
     "email": "dave@vibecap.co"

@@ -14,18 +14,20 @@
 | Daily logs | `memory/daily/YYYY-MM-DD.md` | Check today + yesterday |
 | Registers | `memory/registers/*.md` | On demand |
 | Archive | `memory/archive/` | On search only |
+| Entry metadata | `memory/.recall/metadata.json` | On maintain/status |
 
 ## Commands
 
 | Command | Purpose |
 |---------|---------|
 | `/recall-init` | Scaffold the memory system |
+| `/recall-init-ids` | Add durable IDs to memory entries |
 | `/recall-write <note>` | Write to daily log with gate evaluation |
 | `/recall-log <note>` | Quick append to daily log, no gate |
 | `/recall-search <query>` | Search all memory tiers |
 | `/recall-promote` | Review daily logs, promote to registers |
 | `/recall-status` | Memory health check |
-| `/recall-maintain` | Verify stale entries, clean up |
+| `/recall-maintain` | Pressure-based cleanup with demotion and archival |
 | `/recall-forget <query>` | Mark entries as superseded |
 | `/recall-context` | Show loaded memory context |
 

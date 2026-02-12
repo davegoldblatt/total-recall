@@ -67,6 +67,7 @@ For each promoted item:
 1. Write to the destination with proper metadata (claim, confidence, evidence, last_verified)
 2. Do NOT remove from daily log (daily logs are append-only history)
 3. Check for contradictions with existing entries before writing
+4. **Assign a durable ID**: For single-line list items promoted to CLAUDE.local.md or registers, append a `^tr` ID (10 random lowercase hex chars). Create or update `memory/.recall/metadata.json` with an entry for the new ID (`created_at`, `last_reviewed_at` = now, `pinned: false`, `snoozed_until: null`, `status: "active"`, `tier` from destination file). Create `memory/.recall/` directory if needed. Write metadata.json with sorted keys.
 
 ### 6. Summary
 

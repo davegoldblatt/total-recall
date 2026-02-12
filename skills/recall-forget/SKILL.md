@@ -53,9 +53,19 @@ For each confirmed entry:
 [HH:MM] [superseded] "Prefers dark mode" — marked as no longer current via /recall-forget
 ```
 
-### 5. Confirm
+### 5. Update Metadata
+
+If any superseded entry has an inline `^tr` ID:
+1. Load `memory/.recall/metadata.json` (if it exists)
+2. For each entry with an ID, set `status: "superseded"` and update `last_reviewed_at` to now
+3. Write metadata.json with sorted keys and 2-space indentation
+
+Entries without IDs are handled as before (no metadata update).
+
+### 6. Confirm
 
 ```
 Superseded [N] entries for "[query]".
 Memory updated across [N] files.
+Metadata updated: [N] entries marked superseded.
 ```

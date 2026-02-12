@@ -88,7 +88,7 @@ fi
 # ─────────────────────────────────────────────────────────
 echo ""
 echo "Scaffolding memory system..."
-mkdir -p "$TARGET/memory/daily" "$TARGET/memory/registers" "$TARGET/memory/archive/projects" "$TARGET/memory/archive/daily"
+mkdir -p "$TARGET/memory/daily" "$TARGET/memory/registers" "$TARGET/memory/archive/projects" "$TARGET/memory/archive/daily" "$TARGET/memory/.recall"
 
 # SCHEMA.md
 if [ -f "$TARGET/memory/SCHEMA.md" ]; then

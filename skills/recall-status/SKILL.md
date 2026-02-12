@@ -35,6 +35,13 @@ Memory system not initialized. Run /recall-init to set up.
 - Number of files
 - Total size
 
+**Entry IDs (memory/.recall/metadata.json):**
+- Count entries with `^tr` IDs (tagged) vs without (untagged) across managed files (CLAUDE.local.md, registers, archive)
+- Count metadata.json entries total
+- Count pinned entries
+- Count snoozed entries (with active snooze)
+- Count superseded entries
+
 **Hooks:**
 - Check .claude/settings.json or .claude/settings.local.json for SessionStart and PreCompact hook config
 
@@ -61,6 +68,10 @@ Registers:       [N] files, [size] total
 
 Archive:         [N] files, [size] total
 
+Entry IDs:       [N] tagged / [M] untagged
+                 metadata.json: [N] entries
+                 Pinned: [N], Snoozed: [N], Superseded: [N]
+
 Hooks:
   SessionStart   [✓ configured / ✗ not configured]
   PreCompact     [✓ configured / ✗ not configured]
@@ -77,3 +88,5 @@ Based on metrics, suggest actions:
 - If registers are empty: "Registers are empty — use /recall-promote to populate from daily logs"
 - If working memory stale (7+ days): "Working memory may be stale — review for accuracy"
 - If hooks not configured: "Consider configuring SessionStart/PreCompact hooks for automated memory loading and flush"
+- If untagged entries > 0: "Run /recall-init-ids to tag [N] untagged entries (required for /recall-maintain)"
+- If superseded entries in metadata > 0: "Run /recall-maintain to clean up [N] superseded entries"

@@ -82,6 +82,32 @@ If a contradiction is found:
 - Mark old entry as `[superseded: date]` with reason
 - Write new entry
 
+## ID Assignment on Promotion
+
+When writing an entry to CLAUDE.local.md or a register (either via direct promotion or user-confirmed promotion), assign a durable ID:
+
+1. Generate an ID: `^tr` + 10 random lowercase hex characters
+2. Check for collisions against existing IDs in `memory/.recall/metadata.json` (if it exists) and any inline IDs visible in the destination file
+3. Append ` ^[id]` to the end of the entry line (for single-line list items starting with `- `)
+4. Create or update `memory/.recall/metadata.json` with an entry for the new ID:
+   ```json
+   {
+     "created_at": "[ISO 8601 timestamp]",
+     "last_reviewed_at": "[ISO 8601 timestamp]",
+     "pinned": false,
+     "snoozed_until": null,
+     "status": "active",
+     "tier": "working"
+   }
+   ```
+   Set `tier` to `"working"` for CLAUDE.local.md or `"register"` for register files.
+5. Create the `memory/.recall/` directory if it doesn't exist
+6. Write metadata.json with sorted keys and 2-space indentation
+
+**Daily log entries do NOT get IDs.** Only entries promoted to CLAUDE.local.md or registers are tagged.
+
+**Multi-line metadata blocks** (claim/confidence/evidence/last_verified format) are not tagged with IDs in v1. Only single-line list items get IDs.
+
 ## After Writing
 
 Confirm to the user:
@@ -89,4 +115,4 @@ Confirm to the user:
 Noted in memory/daily/[date].md: [one-line summary]
 ```
 
-If also promoted: mention the additional destination.
+If also promoted: mention the additional destination and the assigned ID.

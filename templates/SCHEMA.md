@@ -169,6 +169,63 @@ Not every line needs full metadata. Use it for claims where being wrong has cons
 
 ---
 
+## Entry IDs and the Remove Gate
+
+Entries in managed files (CLAUDE.local.md, registers, archive) can have durable IDs for tracking and maintenance.
+
+### ID Format
+
+Each managed entry ends with an inline ID token:
+
+```
+- Dave prefers concise error messages ^tr8f2a1c3d7e
+```
+
+- Format: `^tr` + 10 lowercase hex characters
+- Regex: `\^tr[0-9a-f]{10}$`
+- IDs are visible, auditable, and user-editable
+
+### What Gets an ID
+
+- Single-line list items (`- text here`) in CLAUDE.local.md, registers, and archive
+- NOT daily log entries (daily logs are not managed by the remove gate)
+- NOT multi-line metadata blocks (claim/confidence/evidence/last_verified)
+- NOT lines inside fenced code blocks
+- NOT placeholder entries like `- [None captured yet]`
+
+### Sidecar Metadata
+
+Entry metadata lives in `memory/.recall/metadata.json`:
+
+```json
+{
+  "tr8f2a1c3d7e": {
+    "created_at": "2026-02-12T10:15:30Z",
+    "last_reviewed_at": "2026-02-12T10:15:30Z",
+    "pinned": false,
+    "snoozed_until": null,
+    "status": "active",
+    "tier": "working"
+  }
+}
+```
+
+- `status`: `active`, `superseded`, or `archived`
+- `tier`: `working`, `register`, or `archive` (derived from file location - file wins)
+- `pinned`: if true, entry is excluded from pressure-based demotion
+- `snoozed_until`: if set and in the future, entry is excluded from demotion
+
+### Pressure-Based Demotion
+
+When working memory (CLAUDE.local.md) exceeds the 1500-word target, `/recall-maintain` surfaces demotion candidates scored by word cost and staleness. Users choose per-entry: keep, pin, snooze, demote (to `registers/_inbox.md`), archive (to `archive/ARCHIVE.md`), or mark superseded.
+
+### Commands
+
+- `/recall-init-ids` - Add IDs to untagged entries (run before first maintain)
+- `/recall-maintain` - Pressure-based cleanup with pin/snooze/demote/archive
+
+---
+
 ## Hooks
 
 If configured in `.claude/settings.json`:
@@ -206,11 +263,12 @@ These are safety nets. The protocol in `.claude/rules/total-recall.md` also inst
 | Command | Purpose |
 |---------|---------|
 | `/recall-init` | Scaffold the memory system |
+| `/recall-init-ids` | Add durable IDs to memory entries |
 | `/recall-write <note>` | Write to daily log with gate evaluation |
 | `/recall-log <note>` | Quick append, no gate |
 | `/recall-search <query>` | Search all tiers |
 | `/recall-promote` | Review daily logs for promotion |
 | `/recall-status` | Memory health check |
-| `/recall-maintain` | Verify stale entries, prune, clean up |
+| `/recall-maintain` | Pressure-based cleanup with demotion and archival |
 | `/recall-forget <query>` | Mark entries as superseded |
 | `/recall-context` | Show loaded memory context |
